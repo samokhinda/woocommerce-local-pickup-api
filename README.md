@@ -136,16 +136,26 @@ PUT /wp-json/wc/v3/local-pickup-settings
 
 Этот проект лицензирован под MIT License. Если вы используете этот плагин и он вам помогает, пожалуйста, рассмотрите возможность поддержки проекта.
 
-Поддержка проекта
+## Поддержка проекта
 
 Вы можете поддержать проект, сделав донат на один из следующих кошельков:
 
-USDT TRC20: TJqjMMUG1inWWYUGCW1vdUvrZioUFhGafz
+### USDT TRC20
+```
+TJqjMMUG1inWWYUGCW1vdUvrZioUFhGafz
+```
 
-TON: UQCb477bz6nFfEMIdgtUd6nl3bUdeg6I08j01_CIFZOp9Lj5
+### TON
+```
+UQCb477bz6nFfEMIdgtUd6nl3bUdeg6I08j01_CIFZOp9Lj5
+```
 
-BTC: 1B7HtELv5eJAms2ThwbU5t2M645de4j296
+### BTC
+```
+1B7HtELv5eJAms2ThwbU5t2M645de4j296
+```
 
-DOGS: UQCb477bz6nFfEMIdgtUd6nl3bUdeg6I08j01_CIFZOp9Lj5
-
-
+### DOGS
+```
+UQCb477bz6nFfEMIdgtUd6nl3bUdeg6I08j01_CIFZOp9Lj5
+```
