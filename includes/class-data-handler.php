@@ -17,7 +17,7 @@ class DataHandler {
         }
 
         $formatted_locations = [];
-        foreach ($locations as $location) {
+        foreach ($locations as $index => $location) {
             // Формируем структурированный адрес
             $address = isset($location['address']) && is_array($location['address']) ? $location['address'] : [
                 'country' => isset($location['country']) ? $location['country'] : null,
@@ -34,6 +34,7 @@ class DataHandler {
             });
             
             $formatted_locations[] = [
+                'index' => $index, // Добавляем индекс для справки
                 'name' => isset($location['name']) ? $location['name'] : 
                     (isset($location['title']) ? $location['title'] : null),
                 'address' => $address,
@@ -90,8 +91,7 @@ class DataHandler {
         
         // Создаем новую локацию с учетом детальных данных адреса
         $new_location = [
-            'name' => isset($data['name']) ? sanitize_text_field($data['name']) : 
-                (isset($data['title']) ? sanitize_text_field($data['title']) : null),
+            'name' => isset($data['name']) ? sanitize_text_field($data['name']) : null,
             'address' => [
                 'country' => isset($data['address']['country']) ? sanitize_text_field($data['address']['country']) : null,
                 'state' => isset($data['address']['state']) ? sanitize_text_field($data['address']['state']) : null,
@@ -109,6 +109,7 @@ class DataHandler {
         
         // Добавляем локацию в массив
         $locations[] = $new_location;
+        $index = count($locations) - 1;
         
         // Обновляем опцию в базе данных
         $updated = update_option('pickup_location_pickup_locations', $locations);
@@ -120,10 +121,14 @@ class DataHandler {
             ];
         }
         
+        // Добавляем индекс в ответ
+        $response = $this->formatLocationResponse($new_location);
+        $response['index'] = $index;
+        
         return [
             'success' => true,
             'message' => 'Точка самовывоза успешно добавлена.',
-            'data' => $this->formatLocationResponse($new_location)
+            'data' => $response
         ];
     }
     
@@ -143,62 +148,63 @@ class DataHandler {
             ];
         }
         
-        $id = (int)$data['id'];
-        $location_found = false;
-        $updated_location = null;
+        // Используем индекс вместо ID
+        $index = (int)$data['index'];
         
-        // Обновляем локацию с учетом детальных данных адреса
-        foreach ($locations as $key => $location) {
-            if ($location['id'] == $id) {
-                $location_found = true;
-                
-                // Обновляем основные поля
-                if (isset($data['title'])) {
-                    $locations[$key]['title'] = sanitize_text_field($data['title']);
-                }
-                
-                // Обновляем детали адреса
-                if (isset($data['address'])) {
-                    if (isset($data['address']['country'])) {
-                        $locations[$key]['country'] = sanitize_text_field($data['address']['country']);
-                    }
-                    if (isset($data['address']['state'])) {
-                        $locations[$key]['state'] = sanitize_text_field($data['address']['state']);
-                    }
-                    if (isset($data['address']['city'])) {
-                        $locations[$key]['city'] = sanitize_text_field($data['address']['city']);
-                    }
-                    if (isset($data['address']['address_1'])) {
-                        $locations[$key]['address_1'] = sanitize_text_field($data['address']['address_1']);
-                    }
-                    if (isset($data['address']['postcode'])) {
-                        $locations[$key]['postcode'] = sanitize_text_field($data['address']['postcode']);
-                    }
-                }
-                
-                // Обновляем координаты
-                if (isset($data['coordinates'])) {
-                    $locations[$key]['coordinates'] = [
-                        'lat' => isset($data['coordinates']['lat']) ? (float)$data['coordinates']['lat'] : null,
-                        'lng' => isset($data['coordinates']['lng']) ? (float)$data['coordinates']['lng'] : null,
-                    ];
-                }
-                
-                // Обновляем детали самовывоза
-                if (isset($data['details'])) {
-                    $locations[$key]['details'] = sanitize_textarea_field($data['details']);
-                }
-                
-                $updated_location = $locations[$key];
-                break;
+        // Проверяем, что индекс существует
+        if (!isset($locations[$index])) {
+            return [
+                'success' => false,
+                'error' => 'Точка самовывоза с указанным индексом не найдена.'
+            ];
+        }
+        
+        // Обновляем основные поля
+        if (isset($data['name'])) {
+            $locations[$index]['name'] = sanitize_text_field($data['name']);
+        }
+        
+        // Обновляем детали адреса
+        if (isset($data['address'])) {
+            if (!isset($locations[$index]['address']) || !is_array($locations[$index]['address'])) {
+                $locations[$index]['address'] = [];
+            }
+            
+            if (isset($data['address']['country'])) {
+                $locations[$index]['address']['country'] = sanitize_text_field($data['address']['country']);
+            }
+            if (isset($data['address']['state'])) {
+                $locations[$index]['address']['state'] = sanitize_text_field($data['address']['state']);
+            }
+            if (isset($data['address']['city'])) {
+                $locations[$index]['address']['city'] = sanitize_text_field($data['address']['city']);
+            }
+            if (isset($data['address']['address_1'])) {
+                $locations[$index]['address']['address_1'] = sanitize_text_field($data['address']['address_1']);
+            }
+            if (isset($data['address']['postcode'])) {
+                $locations[$index]['address']['postcode'] = sanitize_text_field($data['address']['postcode']);
             }
         }
         
-        if (!$location_found) {
-            return [
-                'success' => false,
-                'error' => 'Точка самовывоза с указанным ID не найдена.'
-            ];
+        // Обновляем координаты
+        if (isset($data['coordinates'])) {
+            if (!isset($locations[$index]['coordinates']) || !is_array($locations[$index]['coordinates'])) {
+                $locations[$index]['coordinates'] = [];
+            }
+            
+            $locations[$index]['coordinates']['lat'] = isset($data['coordinates']['lat']) ? (float)$data['coordinates']['lat'] : null;
+            $locations[$index]['coordinates']['lng'] = isset($data['coordinates']['lng']) ? (float)$data['coordinates']['lng'] : null;
+        }
+        
+        // Обновляем детали самовывоза
+        if (isset($data['details'])) {
+            $locations[$index]['details'] = sanitize_textarea_field($data['details']);
+        }
+        
+        // Обновляем статус активности
+        if (isset($data['enabled'])) {
+            $locations[$index]['enabled'] = (bool)$data['enabled'];
         }
         
         // Обновляем опцию в базе данных
@@ -211,10 +217,14 @@ class DataHandler {
             ];
         }
         
+        // Добавляем индекс в ответ
+        $response = $this->formatLocationResponse($locations[$index]);
+        $response['index'] = $index;
+        
         return [
             'success' => true,
             'message' => 'Точка самовывоза успешно обновлена.',
-            'data' => $this->formatLocationResponse($updated_location)
+            'data' => $response
         ];
     }
     

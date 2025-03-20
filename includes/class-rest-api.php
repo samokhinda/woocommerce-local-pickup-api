@@ -21,12 +21,12 @@ class RestApi {
         ]);
         
         // Обновление существующей точки
-        register_rest_route('wc/v3', '/local-pickup-locations/(?P<id>\d+)', [
+        register_rest_route('wc/v3', '/local-pickup-locations/(?P<index>\d+)', [
             'methods' => 'PUT',
             'callback' => [$this, 'update_local_pickup_location'],
             'permission_callback' => [$this, 'check_permissions'],
             'args' => [
-                'id' => [
+                'index' => [
                     'validate_callback' => function($param) {
                         return is_numeric($param);
                     }
@@ -114,12 +114,12 @@ class RestApi {
     }
     
     public function update_local_pickup_location(WP_REST_Request $request) {
-        // Получаем ID из URL
-        $id = $request->get_param('id');
+        // Получаем индекс из URL
+        $index = $request->get_param('index');
         
         // Получаем данные из запроса
         $data = $request->get_json_params();
-        $data['id'] = $id; // Добавляем ID в данные
+        $data['index'] = $index; // Добавляем индекс в данные
         
         $data_handler = new DataHandler();
         $result = $data_handler->updatePickupLocation($data);

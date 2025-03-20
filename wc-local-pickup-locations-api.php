@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WC Local Pickup Locations API
  * Description: Плагин для получения точек самовывоза через WooCommerce API.
- * Version: 2.1
+ * Version: 2.2
  * Author: Телеботы
  */
 

@@ -32,13 +32,13 @@ POST /wp-json/wc/v3/local-pickup-locations
     "state": "Московская",
     "city": "Москва",
     "address_1": "ул. Ленина, 23-4 (этаж 4)",
-    "postcode": "121121"
+    "postcode": "140000"
   },
   "coordinates": {
     "lat": 50.45,
     "lng": 30.52
   },
-  "details": "Время работы: 9:00-18:00",
+  "details": "часы работы: 10:00-20:00",
   "enabled": true
 }
 ```
@@ -46,8 +46,10 @@ POST /wp-json/wc/v3/local-pickup-locations
 ### Обновление существующей точки самовывоза
 
 ```
-PUT /wp-json/wc/v3/local-pickup-locations/{id}
+PUT /wp-json/wc/v3/local-pickup-locations/{index}
 ```
+
+Где `{index}` - это индекс точки в массиве (начиная с 0).
 
 Пример тела запроса:
 ```json
@@ -88,12 +90,14 @@ PUT /wp-json/wc/v3/local-pickup-settings
   "success": true,
   "data": [
     {
+      "index": 0,
       "name": "Магазин",
       "address": {
         "country": "RU",
         "state": "Московская",
         "city": "Москва",
-        "address_1": "ул. Ленина, 23-4 (этаж 4)"
+        "address_1": "ул. Ленина, 23-4 (этаж 4)",
+        "postcode": "140000"
       },
       "coordinates": {
         "lat": null,
@@ -103,11 +107,14 @@ PUT /wp-json/wc/v3/local-pickup-settings
       "enabled": true
     },
     {
+      "index": 1,
       "name": "Главный офис",
       "address": {
         "country": "RU",
+        "state": "Архангельская",
         "city": "Архангельск",
-        "address_1": "пр. Троицкий, 123-33"
+        "address_1": "пр. Троицкий, 123-33",
+        "postcode": "163000"
       },
       "coordinates": {
         "lat": null,
@@ -117,6 +124,31 @@ PUT /wp-json/wc/v3/local-pickup-settings
       "enabled": true
     }
   ]
+}
+```
+
+#### При создании/обновлении
+```json
+{
+  "success": true,
+  "message": "Точка самовывоза успешно добавлена/обновлена.",
+  "data": {
+    "index": 0,
+    "name": "Магазин",
+    "address": {
+      "country": "RU",
+      "state": "Московская",
+      "city": "Москва",
+      "address_1": "ул. Ленина, 23-4 (этаж 4)",
+      "postcode": "140000"
+    },
+    "coordinates": {
+      "lat": null,
+      "lng": null
+    },
+    "details": "часы работы: 10:00-20:00",
+    "enabled": true
+  }
 }
 ```
 
@@ -133,29 +165,4 @@ PUT /wp-json/wc/v3/local-pickup-settings
 - При некорректных данных будет возвращен статус HTTP 400.
 
 ## Лицензия
-
-Этот проект лицензирован под MIT License. Если вы используете этот плагин и он вам помогает, пожалуйста, рассмотрите возможность поддержки проекта.
-
-## Поддержка проекта
-
-Вы можете поддержать проект, сделав донат на один из следующих кошельков:
-
-### USDT TRC20
-```
-TJqjMMUG1inWWYUGCW1vdUvrZioUFhGafz
-```
-
-### TON
-```
-UQCb477bz6nFfEMIdgtUd6nl3bUdeg6I08j01_CIFZOp9Lj5
-```
-
-### BTC
-```
-1B7HtELv5eJAms2ThwbU5t2M645de4j296
-```
-
-### DOGS
-```
-UQCb477bz6nFfEMIdgtUd6nl3bUdeg6I08j01_CIFZOp9Lj5
-```
+Этот проект лицензирован под MIT License.
